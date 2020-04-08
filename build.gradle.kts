@@ -1,50 +1,73 @@
+import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
+
 plugins {
-    id ("org.springframework.boot") version "2.2.6.RELEASE"
-    id ("io.spring.dependency-management") version "1.0.9.RELEASE"
     java
-    groovy
+    id("org.springframework.boot") version "2.2.6.RELEASE" apply false
+    id("io.spring.dependency-management") version "1.0.9.RELEASE"
     `java-library`
 }
 
-group = "com.example"
-version = "0.0.1-SNAPSHOT"
+
+subprojects {
+    apply(plugin = "java")
+    apply(plugin = "java-library")
+    apply(plugin = "groovy")
+    apply(plugin = "io.spring.dependency-management")
 
 
-configurations {
-    compileOnly {
-        extendsFrom(configurations.getByName("annotationProcessor"))
+
+    group = "com.example"
+    version = "0.0.1-SNAPSHOT"
+
+    configurations {
+        compileOnly {
+            extendsFrom(configurations.getByName("annotationProcessor"))
+        }
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    configure<JavaPluginConvention> {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    dependencies {
+        compileOnly("org.projectlombok:lombok")
+
+        annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+        annotationProcessor("org.projectlombok:lombok")
+
+
+        testImplementation("org.springframework.boot:spring-boot-starter-test")
+        testImplementation("org.spockframework:spock-core")
+        testImplementation("org.spockframework:spock-spring")
+        testImplementation("org.hamcrest:hamcrest-library")
+        testImplementation("org.testcontainers:spock")
+        testImplementation("org.testcontainers:postgresql")
+        //testImplementation("com.playtika.testcontainers:embedded-postgresql")
+    }
+
+    val spockVersion: String by project
+    val embeddedPostgresVersion: String by project
+    val testContainersVersion: String by project
+
+    the<DependencyManagementExtension>().apply {
+        imports {
+            mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+        }
+        dependencies {
+            dependency("org.spockframework:spock-core:${spockVersion}")
+            dependency("org.spockframework:spock-spring:${spockVersion}")
+            dependency("org.testcontainers:spock:${testContainersVersion}")
+            dependency("org.testcontainers:postgresql:${testContainersVersion}")
+            //dependency("com.playtika.testcontainers:embedded-postgresql:${embeddedPostgresVersion}")
+        }
     }
 }
 
-repositories {
-    mavenCentral()
-}
 
-dependencies {
 
-    implementation ("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation ("org.springframework.data:spring-data-envers")
-    implementation ("org.springframework.boot:spring-boot-starter-web")
-    implementation ("org.liquibase:liquibase-core")
 
-    compileOnly ("org.projectlombok:lombok")
-    testCompileOnly ("org.projectlombok:lombok")
 
-    //runtimeOnly ("com.h2database:h2")
-    //runtimeOnly ("com.oracle.ojdbc:ojdbc8")
-    runtimeOnly ("org.postgresql:postgresql")
-
-    annotationProcessor ("org.springframework.boot:spring-boot-configuration-processor")
-    annotationProcessor ("org.projectlombok:lombok")
-
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.spockframework:spock-core:1.3-groovy-2.5")
-    testImplementation("org.spockframework:spock-spring:1.3-groovy-2.5")
-    testImplementation ("org.hamcrest:hamcrest-library:2.2")
-    testImplementation( "org.testcontainers:spock:1.13.0")
-    testImplementation( "com.playtika.testcontainers:embedded-postgresql:1.43")
-}
-
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-}
