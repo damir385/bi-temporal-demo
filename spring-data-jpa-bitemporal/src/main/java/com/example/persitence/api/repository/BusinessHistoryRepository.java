@@ -10,7 +10,6 @@ import java.time.Period;
 import java.util.Set;
 import java.util.UUID;
 
-
 public interface BusinessHistoryRepository<H extends Head> extends JpaRepository<H, UUID>, RevisionRepository<H, UUID, Long> {
 
     H create(H head); //init a new state history

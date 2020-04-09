@@ -13,8 +13,8 @@ import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.data.repository.history.RevisionRepository;
-import org.springframework.data.repository.history.support.RevisionEntityInformation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
@@ -23,6 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+@Validated
 public class BusinessHistoryRepositoryResolver<H extends Head> extends SimpleJpaRepository<H, UUID> implements BusinessHistoryRepository<H> {
 
     private final JpaEntityInformation<H, ?> entityInformation;
