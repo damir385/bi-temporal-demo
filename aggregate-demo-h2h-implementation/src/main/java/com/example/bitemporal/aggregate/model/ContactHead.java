@@ -8,6 +8,7 @@ import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,7 +23,7 @@ public class ContactHead extends AbstractUUIDPersistable implements Head {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "head")
     @Filter(name="state", condition=":validityPoint state_begin AND state_end")
-    private Collection<ContactState> states;
+    private List<ContactState> states;
 
     @ManyToOne
     @JoinColumn(name = "type")

@@ -15,9 +15,10 @@ import java.time.LocalDate;
 @ToString(callSuper = true, exclude = "head")
 @Entity
 @Audited
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.JOINED)
+//@MappedSuperclass
 @SuppressWarnings("squid:S2160")
-public abstract class ContactState extends AbstractUUIDPersistable implements State<ContactHead> {
+public class ContactState extends AbstractUUIDPersistable implements State<ContactHead> {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "head_id")
