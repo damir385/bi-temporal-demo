@@ -1,4 +1,7 @@
 package com.example.bitemporal.repository;
 
-public interface AddressBusinessHistoryRepository {
+import com.example.bitemporal.model.AddressHead;
+import com.example.persitence.api.repository.BusinessHistoryRepository;
+
+public interface AddressBusinessHistoryRepository extends BusinessHistoryRepository<AddressHead> {
 }

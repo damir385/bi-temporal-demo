@@ -7,14 +7,14 @@
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 	<changeSet author="yy" id="partner">
     	<createTable tableName="partner_head">
-        	<column name="id" type="varchar(36)"/>
+        	<column name="id" type="uuid"/>
         	<column name="birth_name" type="varchar(64)"/>
     	</createTable>
     	<addPrimaryKey columnNames="id" constraintName="partner_head_pk" tableName="partner_head"/>
 
 		<createTable tableName="partner_state">
-			<column name="id" type="varchar(36)"/>
-			<column name="head_id" type="varchar(36)"/>
+			<column name="id" type="uuid"/>
+			<column name="head_id" type="uuid"/>
 			<column name="name" type="varchar(64)"/>
 			<column name="state_begin" type="date"/>
 			<column name="state_end" type="date"/>
@@ -27,14 +27,14 @@
 
 	<changeSet author="yy" id="address">
     	<createTable tableName="address_head">
-        	<column name="id" type="varchar(36)"/>
+        	<column name="id" type="uuid"/>
         	<column name="description" type="varchar(64)"/>
     	</createTable>
     	<addPrimaryKey columnNames="id" constraintName="address_pk" tableName="address_head"/>
 
 		<createTable tableName="address_state">
-			<column name="id" type="varchar(36)"/>
-			<column name="head_id" type="varchar(36)"/>
+			<column name="id" type="uuid"/>
+			<column name="head_id" type="uuid"/>
 			<column name="zip_code" type="varchar(8)"/>
 			<column name="street" type="varchar(64)"/>
 			<column name="building_number" type="varchar(16)"/>
@@ -49,16 +49,16 @@
 
 	<changeSet author="yy" id="partner_address">
     	<createTable tableName="partner_address_head">
-        	<column name="id" type="varchar(36)"/>
+        	<column name="id" type="uuid"/>
         	<column name="code" type="varchar(64)"/>
     	</createTable>
     	<addPrimaryKey columnNames="id" constraintName="partner_address_pk" tableName="partner_address_head"/>
 
 		<createTable tableName="partner_address_state">
-			<column name="id" type="varchar(36)"/>
-			<column name="head_id" type="varchar(36)"/>
-			<column name="partner_head_id" type="varchar(36)"/>
-			<column name="address_head_id" type="varchar(36)"/>
+			<column name="id" type="uuid"/>
+			<column name="head_id" type="uuid"/>
+			<column name="partner_head_id" type="uuid"/>
+			<column name="address_head_id" type="uuid"/>
 			<column name="state_begin" type="date"/>
 			<column name="state_end" type="date"/>
 		</createTable>

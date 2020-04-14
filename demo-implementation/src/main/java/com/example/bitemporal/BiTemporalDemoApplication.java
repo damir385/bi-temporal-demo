@@ -10,10 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  */
 
 @SpringBootApplication
-@EnableJpaRepositories(repositoryBaseClass = BusinessHistoryRepositoryResolver.class//,
-        //repositoryFactoryBeanClass = EnversRevisionRepositoryFactoryBean.class
-        //repositoryFactoryBeanClass = BusinessHistoryRepositoryFactoryBean.class
-)
+@EnableJpaRepositories(repositoryBaseClass = BusinessHistoryRepositoryResolver.class)
 public class BiTemporalDemoApplication {
 
     public static void main(String[] args) {

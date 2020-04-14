@@ -2,39 +2,37 @@ package com.example.bitemporal.model;
 
 
 import com.example.persitence.api.model.State;
+import com.example.persitence.model.AbstractUUIDPersistable;
 import lombok.*;
 import org.hibernate.envers.Audited;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@ToString(callSuper = true)
 @Entity
 @Audited
-public class PartnerAddressState implements State<PartnerAddressHead> {
+public class PartnerAddressState extends AbstractUUIDPersistable implements State<PartnerAddressHead> {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-
-
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="head_id")
     private PartnerAddressHead head;
 
-    @ManyToOne
-    @JoinColumn(name="partner_head_id")
-    private PartnerHead partnerHead;
+    private UUID partnerHeadId;
 
-    @ManyToOne
-    @JoinColumn(name="address_head_id")
-    private AddressHead addressHead;
+    private UUID addressHeadId;
 
     private LocalDate stateBegin;
 
     private LocalDate stateEnd;
-
 
 }

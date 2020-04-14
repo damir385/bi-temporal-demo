@@ -46,7 +46,7 @@ public class BusinessHistoryRepositoryResolver<H extends Head> extends SimpleJpa
     @Override
     public H create(H head) {
         if (entityInformation.isNew(head)) {
-            return save(head);
+            return saveAndFlush(head);
         }
         throw new RuntimeException("Head already exists");
     }

@@ -7,5 +7,6 @@ dependencies {
     implementation (project(":spring-data-jpa-bitemporal"))
 
     runtimeOnly ("org.postgresql:postgresql")
+    runtimeOnly ("net.ttddyy:datasource-proxy")
 }
 

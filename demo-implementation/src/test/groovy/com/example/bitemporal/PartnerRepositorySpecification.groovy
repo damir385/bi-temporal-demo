@@ -1,18 +1,16 @@
 package com.example.bitemporal
 
+import com.example.bitemporal.model.AddressHead
+import com.example.bitemporal.model.PartnerAddressHead
 import com.example.bitemporal.model.PartnerHead
-import com.example.bitemporal.repository.AddressBusinessHistoryRepository
-import com.example.bitemporal.repository.AddressBusinessHistoryStateRepository
-import com.example.bitemporal.repository.PartnerBusinessHistoryRepository
-import com.example.bitemporal.repository.PartnerBusinessHistoryStateRepository
+import com.example.bitemporal.repository.*
 import com.example.bitemporal.test.PartnerDbTestUtilities
 import com.example.bitemporal.test.PartnerFactory
-import com.example.persitence.api.validation.CheckTimeConsistency
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.transaction.TransactionSystemException
+import org.springframework.transaction.annotation.Transactional
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.spock.Testcontainers
 import spock.lang.Shared
@@ -26,6 +24,7 @@ import static org.hamcrest.Matchers.notNullValue
 
 @SpringBootTest
 @Testcontainers
+@Transactional
 class PartnerRepositorySpecification extends Specification implements PartnerFactory, PartnerDbTestUtilities {
 
     @Autowired
@@ -40,11 +39,14 @@ class PartnerRepositorySpecification extends Specification implements PartnerFac
     //@Autowired
     PartnerBusinessHistoryStateRepository businessHistoryStateRepository
 
-    //@Autowired
+    @Autowired
     AddressBusinessHistoryRepository addressBusinessHistoryRepository
 
     //@Autowired
     AddressBusinessHistoryStateRepository addressBusinessHistoryStateRepository
+
+    @Autowired
+    PartnerAddressBusinessHistoryRepository partnerAddressBusinessHistoryRepository
 
     //@Autowired
     JdbcTemplate jdbcTemplate
@@ -80,6 +82,9 @@ class PartnerRepositorySpecification extends Specification implements PartnerFac
         assert result, is(partnerHead)
         reportInfo "Result: ${result}"
 
+        List<PartnerHead> partnerHeads = partnerBusinessHistoryRepository.findAll()
+        println(partnerHeads)
+
     }
 
     def "A invalid Partner history create - timeline has gaps"() {
@@ -92,11 +97,8 @@ class PartnerRepositorySpecification extends Specification implements PartnerFac
         partnerBusinessHistoryRepository.create(partnerHead)
 
         then: "it should raise an exception"
-        TransactionSystemException thrown = thrown()
-        causes(thrown).any {
-            it.class == ConstraintViolationException &&
-                    it.message.contains("Time consistency validation failed")
-        }
+        ConstraintViolationException thrown = thrown()
+        thrown.message.contains("Time consistency validation failed")
         reportInfo "Exception: ${thrown}"
     }
 
@@ -110,11 +112,8 @@ class PartnerRepositorySpecification extends Specification implements PartnerFac
         partnerBusinessHistoryRepository.create(partnerHead)
 
         then: "it should raise an exception"
-        TransactionSystemException thrown = thrown()
-        causes(thrown).any {
-            it.class == ConstraintViolationException &&
-                    it.message.contains("must not be null")
-        }
+        ConstraintViolationException thrown = thrown()
+        thrown.message.contains("must not be null")
         reportInfo "Exception: ${thrown}"
     }
 
@@ -128,17 +127,41 @@ class PartnerRepositorySpecification extends Specification implements PartnerFac
         partnerBusinessHistoryRepository.create(partnerHead)
 
         then: "it should raise an exception"
-        TransactionSystemException thrown = thrown()
-        causes(thrown).any {
-            it.class == ConstraintViolationException &&
-                    it.message.contains("Time consistency validation failed")
-        }
+        ConstraintViolationException thrown = thrown()
+        thrown.message.contains("Time consistency validation failed")
         reportInfo "Exception: ${thrown}"
     }
+
+    def "An aggregate history create"() {
+
+        given: "A valid aggregate history"
+        PartnerHead partnerHead = createPartnerHistoryWithAddressHistory()
+        reportInfo "Input: ${partnerHead}"
+
+        when: "it is passed to repository create method"
+        PartnerHead result = partnerBusinessHistoryRepository.create(partnerHead)
+
+        then: "it should be persisted successfully"
+        assert result, is(partnerHead)
+        reportInfo "Result: ${result}"
+
+        List<PartnerHead> partnerHeads = partnerBusinessHistoryRepository.findAll()
+        List<AddressHead> addressHeads = addressBusinessHistoryRepository.findAll()
+        List<PartnerAddressHead> partnerAddressHeads = partnerAddressBusinessHistoryRepository.findAll()
+
+
+        reportInfo "CHECK PARTNER_HEAD: ${partnerHeads}"
+        reportInfo "CHECK ADDRESS_HEAD: ${addressHeads}"
+        reportInfo "CHECK PARTNER_ADDRESS_HEAD: ${partnerAddressHeads}"
+    }
+
+
+
 
     //TODO findOne tests
     //TODO technical history queries
     //TODO rest of the api
     //TODO reference relationships save and queries
+    //TODO temporal queries
 
 }
