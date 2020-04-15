@@ -17,7 +17,8 @@ import java.util.UUID;
 @ToString(callSuper = true, exclude = "person")
 @Entity
 @Audited
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.JOINED)
+@SuppressWarnings("squid:S2160")
 public abstract class ContactState extends AbstractUUIDPersistable implements State<ContactHead> {
 
     @ManyToOne(cascade = CascadeType.ALL)

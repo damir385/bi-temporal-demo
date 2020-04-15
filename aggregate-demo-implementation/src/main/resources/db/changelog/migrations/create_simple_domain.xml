@@ -48,74 +48,55 @@
                                  referencedTableName="contact_type" referencedColumnNames="id"
                                  constraintName="contact_head_type_fk"/>
 
-        <createTable tableName="phone_state">
+        <createTable tableName="contact_state">
             <column name="id" type="uuid">
                 <constraints nullable="false" primaryKey="true" />
             </column>
             <column name="head_id" type="uuid"/>
             <column name="person_id" type="uuid"/>
-            <column name="number" type="varchar(16)"/>
             <column name="state_begin" type="date"/>
             <column name="state_end" type="date"/>
         </createTable>
-        <addForeignKeyConstraint baseTableName="phone_state" baseColumnNames="head_id"
+        <addForeignKeyConstraint baseTableName="contact_state" baseColumnNames="head_id"
                                  referencedTableName="contact_head" referencedColumnNames="id"
-                                 constraintName="phone_state_head_fk"/>
-        <addForeignKeyConstraint baseTableName="phone_state" baseColumnNames="person_id"
+                                 constraintName="contact_state_head_fk"/>
+        <addForeignKeyConstraint baseTableName="contact_state" baseColumnNames="person_id"
                                  referencedTableName="person_head" referencedColumnNames="id"
-                                 constraintName="phone_person_fk"/>
-        <addUniqueConstraint
-                columnNames="head_id, person_id"
-                constraintName="phone_state_head_person_unq"
-                tableName="phone_state"
-        />
+                                 constraintName="contact_person_fk"/>
+
+        <createTable tableName="phone_state">
+            <column name="id" type="uuid">
+                <constraints nullable="false" primaryKey="true" />
+            </column>
+            <column name="number" type="varchar(16)"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="phone_state" baseColumnNames="id"
+                                 referencedTableName="contact_state" referencedColumnNames="id"
+                                 constraintName="phone_contact_fk"/>
+
 
         <createTable tableName="postal_address_state">
             <column name="id" type="uuid">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="head_id" type="uuid"/>
-            <column name="person_id" type="uuid"/>
             <column name="zip_code" type="varchar(8)"/>
             <column name="city" type="varchar(64)"/>
             <column name="street" type="varchar(64)"/>
             <column name="street_number" type="varchar(16)"/>
-            <column name="state_begin" type="date"/>
-            <column name="state_end" type="date"/>
         </createTable>
-        <addForeignKeyConstraint baseTableName="postal_address_state" baseColumnNames="head_id"
-                                 referencedTableName="contact_head" referencedColumnNames="id"
-                                 constraintName="postal_address_state_head_fk"/>
-        <addForeignKeyConstraint baseTableName="postal_address_state" baseColumnNames="person_id"
-                                 referencedTableName="person_head" referencedColumnNames="id"
-                                 constraintName="postal_address_person_fk"/>
-        <addUniqueConstraint
-                columnNames="head_id, person_id"
-                constraintName="postal_address_state_head_person_unq"
-                tableName="postal_address_state"
-        />
+        <addForeignKeyConstraint baseTableName="postal_address_state" baseColumnNames="id"
+                                 referencedTableName="contact_state" referencedColumnNames="id"
+                                 constraintName="postal_address_contact_fk"/>
 
         <createTable tableName="email_state">
             <column name="id" type="uuid">
                 <constraints nullable="false" primaryKey="true" />
             </column>
-            <column name="head_id" type="uuid"/>
-            <column name="person_id" type="uuid"/>
             <column name="email" type="varchar(64)"/>
-            <column name="state_begin" type="date"/>
-            <column name="state_end" type="date"/>
         </createTable>
-        <addForeignKeyConstraint baseTableName="email_state" baseColumnNames="head_id"
-                                 referencedTableName="contact_head" referencedColumnNames="id"
-                                 constraintName="email_state_head_fk"/>
-        <addForeignKeyConstraint baseTableName="email_state" baseColumnNames="person_id"
-                                 referencedTableName="person_head" referencedColumnNames="id"
-                                 constraintName="email_person_fk"/>
-        <addUniqueConstraint
-                columnNames="head_id, person_id"
-                constraintName="email_state_head_person_unq"
-                tableName="email_state"
-        />
+        <addForeignKeyConstraint baseTableName="email_state" baseColumnNames="id"
+                                 referencedTableName="contact_state" referencedColumnNames="id"
+                                 constraintName="email_contact_fk"/>
 
         <insert tableName="contact_type">
             <column name="id">7ca46d0b-fdc4-44ff-9790-97475ba993b8</column>
@@ -155,11 +136,6 @@
         <addForeignKeyConstraint baseTableName="contract_state" baseColumnNames="person_id"
                                  referencedTableName="person_head" referencedColumnNames="id"
                                  constraintName="contract_person_fk"/>
-        <addUniqueConstraint
-                columnNames="head_id, person_id"
-                constraintName="contract_state_head_person_unq"
-                tableName="contract_state"
-        />
 
         <createTable tableName="item_head">
             <column name="id" type="uuid">
@@ -184,11 +160,7 @@
         <addForeignKeyConstraint baseTableName="item_state" baseColumnNames="contract_id"
                                  referencedTableName="contract_head" referencedColumnNames="id"
                                  constraintName="item_contract_fk"/>
-        <addUniqueConstraint
-                columnNames="head_id, contract_id"
-                constraintName="item_state_head_contract_unq"
-                tableName="item_state"
-        />
+
 
         <createTable tableName="discount_head">
             <column name="id" type="uuid">
@@ -213,11 +185,6 @@
         <addForeignKeyConstraint baseTableName="discount_state" baseColumnNames="contract_id"
                                  referencedTableName="contract_head" referencedColumnNames="id"
                                  constraintName="discount_contract_fk"/>
-        <addUniqueConstraint
-                columnNames="head_id, contract_id"
-                constraintName="discount_state_head_contract_unq"
-                tableName="discount_state"
-        />
     </changeSet>
 
 </databaseChangeLog>
