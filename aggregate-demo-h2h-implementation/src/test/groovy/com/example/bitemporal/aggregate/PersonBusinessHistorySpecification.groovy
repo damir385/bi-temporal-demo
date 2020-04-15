@@ -3,6 +3,7 @@ package com.example.bitemporal.aggregate
 import com.example.bitemporal.aggregate.model.ContactHead
 import com.example.bitemporal.aggregate.model.ContractHead
 import com.example.bitemporal.aggregate.model.ContractState
+import com.example.bitemporal.aggregate.model.DiscountState
 import com.example.bitemporal.aggregate.model.PersonHead
 import com.example.bitemporal.aggregate.repository.ContactBusinessHistoryRepository
 import com.example.bitemporal.aggregate.repository.ContractBusinessHistoryRepository
@@ -88,6 +89,34 @@ class PersonBusinessHistorySpecification extends Specification implements Person
         reportInfo "CHECK CONTACT_HEAD: ${contactHeads}"
         reportInfo "CHECK CONTRACT_HEAD: ${contractHeads}"
         reportInfo "CHECK CONTRACT_STATE: ${contractStates}"
+    }
+
+    def "An aggregate history update"() {
+
+        given: "A valid aggregate history stored and read from database"
+        repository.create(validPerson())
+        PersonHead personHead = repository.findAll()[0]
+        String initial = personHead.contracts[0].discounts[0].states.toString()
+        int initialSize = personHead.contracts[0].discounts[0].states.size()
+        reportInfo "Initial discounts: ${initial}"
+
+
+        when: "it discounts are being manipulated"
+        personHead.contracts[0].discounts[0].states.remove(personHead.contracts[0].discounts[0].states[0])
+        DiscountState newDiscount = newDiscount(personHead.contracts[0].discounts[0].states[0].stateEnd, 12)
+        personHead.contracts[0].discounts[0].states.add(newDiscount)
+
+        and: "the change is saved"
+        repository.saveAndFlush(personHead)
+
+        then: "it should be persisted successfully"
+        PersonHead result = repository.findById(personHead.id).get()
+        assert result.contracts[0].discounts[0].states.any {it. reason == newDiscount.reason}
+        assert result.contracts[0].discounts[0].states.size() == initialSize
+
+
+        reportInfo "CHECK DISCOUNTS: ${result.contracts[0].discounts[0].states}"
+
     }
 
 

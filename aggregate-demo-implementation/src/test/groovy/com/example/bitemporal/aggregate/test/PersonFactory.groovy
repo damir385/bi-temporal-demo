@@ -2,6 +2,8 @@ package com.example.bitemporal.aggregate.test
 
 import com.example.bitemporal.aggregate.model.*
 
+import java.time.LocalDate
+
 import static java.time.LocalDate.of
 
 trait PersonFactory {
@@ -137,5 +139,12 @@ trait PersonFactory {
         itemHead.setStates([itemState1, itemState2])
 
         [itemState1, itemState2]
+    }
+
+    DiscountState newDiscount(LocalDate startDate, int durationInMonths) {
+        LocalDate endDate = startDate.plusMonths(durationInMonths)
+        DiscountState discountState = DiscountState.builder().reason("A brand new promotional thing").value(77.1d).stateBegin(startDate).stateEnd(endDate).build()
+
+        discountState
     }
 }
