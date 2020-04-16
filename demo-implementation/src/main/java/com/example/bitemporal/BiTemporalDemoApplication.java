@@ -1,6 +1,6 @@
 package com.example.bitemporal;
 
-import com.example.persitence.repository.BusinessHistoryRepositoryResolver;
+import com.example.persistence.repository.BusinessHistoryRepositoryResolver;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;

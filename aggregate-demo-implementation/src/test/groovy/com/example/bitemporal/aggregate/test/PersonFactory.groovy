@@ -1,6 +1,20 @@
 package com.example.bitemporal.aggregate.test
 
-import com.example.bitemporal.aggregate.model.*
+
+import com.example.bitemporal.aggregate.model.code.ContactType
+import com.example.bitemporal.aggregate.model.extension.EmailState
+import com.example.bitemporal.aggregate.model.extension.PhoneState
+import com.example.bitemporal.aggregate.model.extension.PostalAddressState
+import com.example.bitemporal.aggregate.model.head.ContactHead
+import com.example.bitemporal.aggregate.model.head.ContractHead
+import com.example.bitemporal.aggregate.model.head.DiscountHead
+import com.example.bitemporal.aggregate.model.head.ItemHead
+import com.example.bitemporal.aggregate.model.head.PersonHead
+import com.example.bitemporal.aggregate.model.state.ContactState
+import com.example.bitemporal.aggregate.model.state.ContractState
+import com.example.bitemporal.aggregate.model.state.DiscountState
+import com.example.bitemporal.aggregate.model.state.ItemState
+import com.example.bitemporal.aggregate.model.state.PersonState
 
 import java.time.LocalDate
 

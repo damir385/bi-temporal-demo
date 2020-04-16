@@ -1,6 +1,6 @@
 package com.example.bitemporal.aggregate;
 
-import com.example.persitence.repository.BusinessHistoryRepositoryResolver;
+import com.example.persistence.repository.BusinessHistoryRepositoryResolver;
 import net.ttddyy.dsproxy.listener.logging.SLF4JLogLevel;
 import net.ttddyy.dsproxy.support.ProxyDataSource;
 import net.ttddyy.dsproxy.support.ProxyDataSourceBuilder;

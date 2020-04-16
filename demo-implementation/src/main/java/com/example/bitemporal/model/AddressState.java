@@ -1,8 +1,8 @@
 package com.example.bitemporal.model;
 
 
-import com.example.persitence.api.model.State;
-import com.example.persitence.model.AbstractUUIDPersistable;
+import com.example.persistence.api.model.State;
+import com.example.persistence.model.AbstractUUIDPersistable;
 import lombok.*;
 import org.hibernate.envers.Audited;
 

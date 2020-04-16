@@ -1,10 +1,12 @@
 package com.example.bitemporal.model;
 
 
-import com.example.persitence.api.model.Head;
-import com.example.persitence.model.AbstractUUIDPersistable;
+import com.example.persistence.api.model.Head;
+import com.example.persistence.model.AbstractUUIDPersistable;
 import lombok.*;
 import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.CascadeType;
@@ -21,12 +23,13 @@ import java.util.Collection;
 @ToString(callSuper = true)
 @Entity
 @Audited
+@FilterDef(name="state", parameters={@ParamDef(name="keyDate", type="timestamp")})
 public class AddressHead extends AbstractUUIDPersistable implements Head {
 
     private String description;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "head")
-    @Filter(name="state", condition=":validityPoint state_begin AND state_end")
+    @Filter(name="state", condition=":keyDate BETWEEN state_begin AND state_end")
     private Collection<AddressState> states;
 
     @OneToMany(cascade = CascadeType.ALL)

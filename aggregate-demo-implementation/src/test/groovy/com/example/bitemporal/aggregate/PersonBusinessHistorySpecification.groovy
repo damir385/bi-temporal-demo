@@ -1,14 +1,16 @@
 package com.example.bitemporal.aggregate
 
-import com.example.bitemporal.aggregate.model.ContactHead
-import com.example.bitemporal.aggregate.model.ContractHead
-import com.example.bitemporal.aggregate.model.ContractState
-import com.example.bitemporal.aggregate.model.DiscountState
-import com.example.bitemporal.aggregate.model.PersonHead
+
+import com.example.bitemporal.aggregate.model.head.ContactHead
+import com.example.bitemporal.aggregate.model.head.ContractHead
+import com.example.bitemporal.aggregate.model.head.PersonHead
+import com.example.bitemporal.aggregate.model.state.ContractState
+import com.example.bitemporal.aggregate.model.state.DiscountState
 import com.example.bitemporal.aggregate.repository.ContactBusinessHistoryRepository
 import com.example.bitemporal.aggregate.repository.ContractBusinessHistoryRepository
 import com.example.bitemporal.aggregate.repository.ContractStateRepository
 import com.example.bitemporal.aggregate.repository.PersonBusinessHistoryRepository
+import com.example.bitemporal.aggregate.repository.PersonRepository
 import com.example.bitemporal.aggregate.test.PersonFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -20,7 +22,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 import javax.persistence.EntityManager
-import java.util.function.Predicate
+import java.time.LocalDate
 
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.notNullValue
@@ -47,6 +49,9 @@ class PersonBusinessHistorySpecification extends Specification implements Person
 
     @Autowired
     ContractStateRepository contractStateRepository
+
+    @Autowired
+    PersonRepository personRepository
 
     @Shared
     PostgreSQLContainer container = new PostgreSQLContainer()
@@ -112,7 +117,7 @@ class PersonBusinessHistorySpecification extends Specification implements Person
 
         then: "it should be persisted successfully"
         PersonHead result = repository.findById(personHead.id).get()
-        assert result.contracts[0].head.discounts.any {it. reason == newDiscount.reason}
+        assert result.contracts[0].head.discounts.any { it.reason == newDiscount.reason }
         assert result.contracts[0].head.discounts.size() == initialSize
 
 
@@ -120,5 +125,40 @@ class PersonBusinessHistorySpecification extends Specification implements Person
 
     }
 
+    def "A snapshot fetch for an aggregate for given key date"() {
+
+        given: "A valid aggregate history stored in database"
+        PersonHead person = repository.create(validPerson())
+        UUID id = person.id
+        reportInfo "Initial discounts: ${person}"
+
+        and: "a keyDate"
+        LocalDate keyDate = LocalDate.of(2003, 1, 1)
+
+
+        when: "it is read with a keyDate"
+        entityManager.clear() //clears the cache
+        PersonHead snapshot = repository.findOneByIdAndKeyDate(id, keyDate).get()
+
+
+        then: "it should return only hte states valid for a given keyDate"
+        assert snapshot.states.size() == 1
+        assert snapshot.states[0].stateBegin.isBefore(keyDate)
+        assert snapshot.states[0].stateEnd.isAfter(keyDate)
+        assert snapshot.contracts.every {
+            it.stateBegin.isBefore(keyDate) &&
+                    it.stateEnd.isAfter(keyDate) &&
+                    it.head.items.every {
+                        it.stateBegin.isBefore(keyDate) && it.stateEnd.isAfter(keyDate)
+                    } &&
+                    it.head.discounts.every {
+                        it.stateBegin.isBefore(keyDate) && it.stateEnd.isAfter(keyDate)
+                    }
+
+        }
+        assert snapshot.contacts.every { it.stateBegin.isBefore(keyDate) && it.stateEnd.isAfter(keyDate) }
+        reportInfo "CHECK SNAPSHOT: ${snapshot}"
+
+    }
 
 }
