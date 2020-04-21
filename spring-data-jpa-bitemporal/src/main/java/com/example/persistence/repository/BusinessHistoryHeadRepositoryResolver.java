@@ -1,7 +1,7 @@
 package com.example.persistence.repository;
 
 import com.example.persistence.api.model.Head;
-import com.example.persistence.api.repository.BusinessHistoryRepository;
+import com.example.persistence.api.repository.BusinessHistoryHeadRepository;
 import org.hibernate.Session;
 import org.hibernate.envers.DefaultRevisionEntity;
 import org.springframework.data.domain.Page;
@@ -11,7 +11,9 @@ import org.springframework.data.envers.repository.support.ReflectionRevisionEnti
 import org.springframework.data.history.Revision;
 import org.springframework.data.history.Revisions;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.history.RevisionRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -19,20 +21,20 @@ import org.springframework.validation.annotation.Validated;
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.example.persistence.repository.RepositoryUtil.*;
 import static java.lang.String.format;
 
 @Validated
 @Transactional(readOnly = true)
-public class BusinessHistoryRepositoryResolver<H extends Head> extends SimpleJpaRepository<H, UUID> implements BusinessHistoryRepository<H> {
+@NoRepositoryBean
+public class BusinessHistoryHeadRepositoryResolver<H extends Head> extends SimpleJpaRepository<H, UUID> implements BusinessHistoryHeadRepository<H> {
 
-    private static final ZoneId defaultZone = ZoneId.systemDefault();
-    private static final String DEFAULT_FILTER_NAME = "state";
+
 
     private final JpaEntityInformation<H, ?> entityInformation;
     private final RevisionRepository<H, UUID, Long> revisionRepository;
@@ -40,7 +42,7 @@ public class BusinessHistoryRepositoryResolver<H extends Head> extends SimpleJpa
     private final EntityManager em;
 
 
-    public BusinessHistoryRepositoryResolver(JpaEntityInformation<H, ?> entityInformation, EntityManager entityManager) {
+    public BusinessHistoryHeadRepositoryResolver(JpaEntityInformation<H, ?> entityInformation, EntityManager entityManager) {
         super(entityInformation, entityManager);
         this.entityInformation = entityInformation;
         this.revisionRepository = new EnversRevisionRepositoryImpl<>(entityInformation,
@@ -48,11 +50,8 @@ public class BusinessHistoryRepositoryResolver<H extends Head> extends SimpleJpa
         this.em = entityManager;
     }
 
-    @Transactional
-    public void setFilterDefaults() {
-        final Session session = em.unwrap(Session.class);
-        if (session.getEnabledFilter(DEFAULT_FILTER_NAME) == null)
-            em.unwrap(Session.class).enableFilter(DEFAULT_FILTER_NAME);
+    public BusinessHistoryHeadRepositoryResolver(Class<H> domainClass, EntityManager em) {
+        this(JpaEntityInformationSupport.getEntityInformation(domainClass, em), em);
     }
 
     @Transactional
@@ -89,12 +88,8 @@ public class BusinessHistoryRepositoryResolver<H extends Head> extends SimpleJpa
     @Override
     @Transactional(readOnly = true)
     public Optional<H> findOneByIdAndKeyDate(UUID id, LocalDate keyDate) {
-        setFilterDefaults();
-        final Date date = Date.from(keyDate.atStartOfDay(defaultZone).toInstant());
-        em.unwrap(Session.class).getEnabledFilter("state").setParameter("keyDate", date);
-        Optional<H> head = Optional.ofNullable((H) em.createQuery(format("SELECT h FROM %s h where id = :id", entityInformation.getEntityName())).setParameter("id", id).getSingleResult());
-        return head;
-
+        setFilterDefaults(em, keyDate);
+        return Optional.ofNullable((H) em.createQuery(format("SELECT h FROM %s h where id = :id", entityInformation.getEntityName())).setParameter("id", id).getSingleResult());
     }
 
     @Override

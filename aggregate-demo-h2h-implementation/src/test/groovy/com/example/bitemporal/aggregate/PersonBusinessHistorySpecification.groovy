@@ -5,10 +5,10 @@ import com.example.bitemporal.aggregate.model.head.ContractHead
 import com.example.bitemporal.aggregate.model.state.ContractState
 import com.example.bitemporal.aggregate.model.state.DiscountState
 import com.example.bitemporal.aggregate.model.head.PersonHead
-import com.example.bitemporal.aggregate.repository.ContactBusinessHistoryRepository
-import com.example.bitemporal.aggregate.repository.ContractBusinessHistoryRepository
+import com.example.bitemporal.aggregate.repository.ContactBusinessHistoryHeadRepository
+import com.example.bitemporal.aggregate.repository.ContractBusinessHistoryHeadRepository
 import com.example.bitemporal.aggregate.repository.ContractStateRepository
-import com.example.bitemporal.aggregate.repository.PersonBusinessHistoryRepository
+import com.example.bitemporal.aggregate.repository.PersonBusinessHistoryHeadRepository
 import com.example.bitemporal.aggregate.test.PersonFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -37,13 +37,13 @@ class PersonBusinessHistorySpecification extends Specification implements Person
     EntityManager entityManager
 
     @Autowired
-    PersonBusinessHistoryRepository repository
+    PersonBusinessHistoryHeadRepository repository
 
     @Autowired
-    ContactBusinessHistoryRepository contactBusinessHistoryRepository
+    ContactBusinessHistoryHeadRepository contactBusinessHistoryRepository
 
     @Autowired
-    ContractBusinessHistoryRepository contractBusinessHistoryRepository
+    ContractBusinessHistoryHeadRepository contractBusinessHistoryRepository
 
     @Autowired
     ContractStateRepository contractStateRepository

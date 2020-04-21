@@ -34,19 +34,19 @@ class PartnerRepositorySpecification extends Specification implements PartnerFac
     EntityManager entityManager
 
     @Autowired
-    PartnerBusinessHistoryRepository partnerBusinessHistoryRepository
+    PartnerBusinessHistoryHeadRepository partnerBusinessHistoryRepository
 
     //@Autowired
     PartnerBusinessHistoryStateRepository businessHistoryStateRepository
 
     @Autowired
-    AddressBusinessHistoryRepository addressBusinessHistoryRepository
+    AddressBusinessHistoryHeadRepository addressBusinessHistoryRepository
 
     //@Autowired
     AddressBusinessHistoryStateRepository addressBusinessHistoryStateRepository
 
     @Autowired
-    PartnerAddressBusinessHistoryRepository partnerAddressBusinessHistoryRepository
+    PartnerAddressBusinessHistoryHeadRepository partnerAddressBusinessHistoryRepository
 
     //@Autowired
     JdbcTemplate jdbcTemplate

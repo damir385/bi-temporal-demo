@@ -3,6 +3,7 @@ package com.example.persistence.api.repository;
 
 import com.example.persistence.api.model.Head;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.history.RevisionRepository;
 
 import java.time.LocalDate;
@@ -10,8 +11,8 @@ import java.time.Period;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
-public interface BusinessHistoryRepository<H extends Head> extends JpaRepository<H, UUID>, RevisionRepository<H, UUID, Long> {
+@NoRepositoryBean
+public interface BusinessHistoryHeadRepository<H extends Head> extends JpaRepository<H, UUID>, RevisionRepository<H, UUID, Long> {
 
     H create(H head); //init a new state history
     H overwrite(H head); //overwrites the whole history

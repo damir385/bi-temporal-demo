@@ -1,6 +1,6 @@
 package com.example.bitemporal.aggregate;
 
-import com.example.persistence.repository.BusinessHistoryRepositoryResolver;
+import com.example.persistence.repository.BusinessHistoryHeadRepositoryResolver;
 import net.ttddyy.dsproxy.listener.logging.SLF4JLogLevel;
 import net.ttddyy.dsproxy.support.ProxyDataSource;
 import net.ttddyy.dsproxy.support.ProxyDataSourceBuilder;
@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
  */
 
 @SpringBootApplication
-@EnableJpaRepositories(repositoryBaseClass = BusinessHistoryRepositoryResolver.class)
+@EnableJpaRepositories(repositoryBaseClass = BusinessHistoryHeadRepositoryResolver.class)
 public class BiTemporalDemoH2HAggregateApplication {
 
     public static void main(String[] args) {

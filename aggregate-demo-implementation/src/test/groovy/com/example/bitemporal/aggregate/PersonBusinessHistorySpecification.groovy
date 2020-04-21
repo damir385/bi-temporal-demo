@@ -1,16 +1,16 @@
 package com.example.bitemporal.aggregate
 
-
 import com.example.bitemporal.aggregate.model.head.ContactHead
 import com.example.bitemporal.aggregate.model.head.ContractHead
 import com.example.bitemporal.aggregate.model.head.PersonHead
 import com.example.bitemporal.aggregate.model.state.ContractState
 import com.example.bitemporal.aggregate.model.state.DiscountState
-import com.example.bitemporal.aggregate.repository.ContactBusinessHistoryRepository
-import com.example.bitemporal.aggregate.repository.ContractBusinessHistoryRepository
+import com.example.bitemporal.aggregate.model.state.PersonState
+import com.example.bitemporal.aggregate.repository.ContactBusinessHistoryHeadRepository
+import com.example.bitemporal.aggregate.repository.ContractBusinessHistoryHeadRepository
 import com.example.bitemporal.aggregate.repository.ContractStateRepository
-import com.example.bitemporal.aggregate.repository.PersonBusinessHistoryRepository
-import com.example.bitemporal.aggregate.repository.PersonRepository
+import com.example.bitemporal.aggregate.repository.PersonBusinessHistoryHeadRepository
+import com.example.bitemporal.aggregate.repository.PersonStateRepository
 import com.example.bitemporal.aggregate.test.PersonFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -18,6 +18,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.transaction.annotation.Transactional
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.spock.Testcontainers
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -39,19 +40,20 @@ class PersonBusinessHistorySpecification extends Specification implements Person
     EntityManager entityManager
 
     @Autowired
-    PersonBusinessHistoryRepository repository
+    PersonBusinessHistoryHeadRepository repository
 
     @Autowired
-    ContactBusinessHistoryRepository contactBusinessHistoryRepository
+    ContactBusinessHistoryHeadRepository contactBusinessHistoryRepository
 
     @Autowired
-    ContractBusinessHistoryRepository contractBusinessHistoryRepository
+    ContractBusinessHistoryHeadRepository contractBusinessHistoryRepository
 
     @Autowired
     ContractStateRepository contractStateRepository
 
     @Autowired
-    PersonRepository personRepository
+    PersonStateRepository stateRepository
+
 
     @Shared
     PostgreSQLContainer container = new PostgreSQLContainer()
@@ -130,7 +132,7 @@ class PersonBusinessHistorySpecification extends Specification implements Person
         given: "A valid aggregate history stored in database"
         PersonHead person = repository.create(validPerson())
         UUID id = person.id
-        reportInfo "Initial discounts: ${person}"
+        reportInfo "Initial: ${person}"
 
         and: "a keyDate"
         LocalDate keyDate = LocalDate.of(2003, 1, 1)
@@ -141,7 +143,7 @@ class PersonBusinessHistorySpecification extends Specification implements Person
         PersonHead snapshot = repository.findOneByIdAndKeyDate(id, keyDate).get()
 
 
-        then: "it should return only hte states valid for a given keyDate"
+        then: "it should return only the states valid for a given keyDate"
         assert snapshot.states.size() == 1
         assert snapshot.states[0].stateBegin.isBefore(keyDate)
         assert snapshot.states[0].stateEnd.isAfter(keyDate)
@@ -159,6 +161,76 @@ class PersonBusinessHistorySpecification extends Specification implements Person
         assert snapshot.contacts.every { it.stateBegin.isBefore(keyDate) && it.stateEnd.isAfter(keyDate) }
         reportInfo "CHECK SNAPSHOT: ${snapshot}"
 
+    }
+
+    @Ignore
+    def "Partial update test"(){
+
+        given: "A valid aggregate history stored in database"
+        PersonHead person = repository.create(validPerson())
+        UUID id = person.id
+        reportInfo "Initial discounts: ${person}"
+
+        when: "it is being retrieved with a state for a given keyDate"
+        entityManager.clear() //without this keyDate is ignored --cache!!!!!
+        LocalDate keyDate = LocalDate.of(2003, 1, 1)
+        PersonHead snapshot = repository.findOneByIdAndKeyDate(id, keyDate).get()
+
+        and: "then changed"
+        snapshot.states[0].firstName = "first name changed by test"
+
+        and: "then saved"
+        repository.saveAndFlush(snapshot)
+
+
+        then: "other aggregate states in the business history have to be unaffected"
+        entityManager.clear() //clears the cache
+        List<PersonState> allStates = stateRepository.findAll()
+        reportInfo "All states: ${allStates}"
+        PersonHead newPerson = repository.findById(id).get()
+        //assert newPerson.states.size() > 1 //this fails here
+        //assert newPerson.states.any{ it.firstName =! "first name changed by test"} //this fails here
+
+        and: "again without cache"
+        entityManager.clear() //and now it should work
+        PersonHead yetAnotherPerson = repository.findById(id).get()
+        assert yetAnotherPerson.states.size() > 1
+        assert yetAnotherPerson.states.any{ it.firstName =! "first name changed by test"}
+    }
+
+    //states
+    @Ignore
+    def "A snapshot fetch for an aggregate via state entity for given key date"() {
+
+        given: "A valid aggregate history stored in database"
+        PersonHead person = repository.create(validPerson())
+        UUID id = person.id
+        reportInfo "Initial aggregate: ${person}"
+        entityManager.clear()
+
+        when: "It is being retrieved via state entity"
+        LocalDate keyDate = LocalDate.of(2003, 1, 1)
+        PersonState state = stateRepository.findOneByKeyDate(id, keyDate).get()
+
+        then: "it should return only the states valid for a given keyDate"
+
+        reportInfo "Fetched states by a key date: ${state}"
+        reportInfo "Fetched head via state by a key date: ${state.head}"
+        assert state.head.states.size() == 1
+        assert state.head.states[0].stateBegin.isBefore(keyDate)
+        assert state.head.states[0].stateEnd.isAfter(keyDate)
+        assert state.head.contracts.every {
+            it.stateBegin.isBefore(keyDate) &&
+                    it.stateEnd.isAfter(keyDate) &&
+                    it.head.items.every {
+                        it.stateBegin.isBefore(keyDate) && it.stateEnd.isAfter(keyDate)
+                    } &&
+                    it.head.discounts.every {
+                        it.stateBegin.isBefore(keyDate) && it.stateEnd.isAfter(keyDate)
+                    }
+
+        }
+        assert state.head.contacts.every { it.stateBegin.isBefore(keyDate) && it.stateEnd.isAfter(keyDate) }
     }
 
 }

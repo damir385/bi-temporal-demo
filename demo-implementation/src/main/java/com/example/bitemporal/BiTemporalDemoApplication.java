@@ -1,6 +1,6 @@
 package com.example.bitemporal;
 
-import com.example.persistence.repository.BusinessHistoryRepositoryResolver;
+import com.example.persistence.repository.BusinessHistoryHeadRepositoryResolver;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  */
 
 @SpringBootApplication
-@EnableJpaRepositories(repositoryBaseClass = BusinessHistoryRepositoryResolver.class)
+@EnableJpaRepositories(repositoryBaseClass = BusinessHistoryHeadRepositoryResolver.class)
 public class BiTemporalDemoApplication {
 
     public static void main(String[] args) {
