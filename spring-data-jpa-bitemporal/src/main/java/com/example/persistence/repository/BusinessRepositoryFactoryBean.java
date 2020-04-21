@@ -11,9 +11,10 @@ import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 
 import javax.persistence.EntityManager;
+import java.util.UUID;
 
 
-public class BusinessRepositoryFactoryBean <R extends JpaRepository<T, UUID>, T, UUID> extends JpaRepositoryFactoryBean<R, T, UUID> {
+public class BusinessRepositoryFactoryBean <R extends JpaRepository<T, UUID>, T> extends JpaRepositoryFactoryBean<R, T, UUID> {
 
     private static final Class<?> BUSINESS_HISTORY_HEAD_REPOSITORY_INTERFACE = BusinessHistoryHeadRepository.class;
     private static final Class<?> BUSINESS_HISTORY_STATE_REPOSITORY_INTERFACE = BusinessHistoryStateRepository.class;
@@ -34,7 +35,7 @@ public class BusinessRepositoryFactoryBean <R extends JpaRepository<T, UUID>, T,
         return new BusinessRepositoryFactory(entityManager);
     }
 
-    private static class BusinessRepositoryFactory<T, UUID> extends JpaRepositoryFactory
+    private static class BusinessRepositoryFactory<T> extends JpaRepositoryFactory
     {
         BusinessRepositoryFactory(final EntityManager entityManager)
         {

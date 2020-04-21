@@ -36,21 +36,12 @@ public class BusinessHistoryStateRepositoryResolver<S extends State<?>> extends 
 
     private final EntityManager em;
 
-    private Map<Class<?>, BusinessHistoryStateRepository<?>> childRepositories = new HashMap<>();
-
-
     public BusinessHistoryStateRepositoryResolver(JpaEntityInformation<S, ?> entityInformation, EntityManager entityManager) {
         super(entityInformation, entityManager);
         this.entityInformation = entityInformation;
         this.revisionRepository = new EnversRevisionRepositoryImpl<>(entityInformation,
                 new ReflectionRevisionEntityInformation(DefaultRevisionEntity.class), entityManager);
         this.em = entityManager;
-
-        childRepositories.put(entityInformation.getJavaType(), this);
-
-        Set<Class<?>> childStatesClasses = getHeadReferences(entityInformation.getJavaType(), em);
-
-        childStatesClasses.forEach(clazz -> childRepositories.put(clazz, null));
     }
 
     public BusinessHistoryStateRepositoryResolver(Class<S> domainClass, EntityManager em) {
@@ -80,8 +71,9 @@ public class BusinessHistoryStateRepositoryResolver<S extends State<?>> extends 
 
     @Override
     public S saveAllCurrentStates(S state) {
-        getHeadReferenceValues(state, em)
-                .stream().forEach(s -> saveState(s, em));
+        //TODO
+        //getHeadReferenceValues(state, em)
+        //        .stream().forEach(s -> saveState(s, em));
         if (entityInformation.isNew(state)) {
             em.persist(state);
             return state;

@@ -164,7 +164,7 @@ class PersonBusinessHistorySpecification extends Specification implements Person
     }
 
     @Ignore
-    def "Partial update test"(){
+    def "Partial update test"() {
 
         given: "A valid aggregate history stored in database"
         PersonHead person = repository.create(validPerson())
@@ -195,11 +195,10 @@ class PersonBusinessHistorySpecification extends Specification implements Person
         entityManager.clear() //and now it should work
         PersonHead yetAnotherPerson = repository.findById(id).get()
         assert yetAnotherPerson.states.size() > 1
-        assert yetAnotherPerson.states.any{ it.firstName =! "first name changed by test"}
+        assert yetAnotherPerson.states.any { it.firstName = !"first name changed by test" }
     }
 
     //states
-    @Ignore
     def "A snapshot fetch for an aggregate via state entity for given key date"() {
 
         given: "A valid aggregate history stored in database"
@@ -214,6 +213,43 @@ class PersonBusinessHistorySpecification extends Specification implements Person
 
         then: "it should return only the states valid for a given keyDate"
 
+        reportInfo "Fetched states by a key date: ${state}"
+        reportInfo "Fetched head via state by a key date: ${state.head}"
+        assert state.head.states.size() == 1
+        assert state.head.states[0].stateBegin.isBefore(keyDate)
+        assert state.head.states[0].stateEnd.isAfter(keyDate)
+        assert state.head.contracts.every {
+            it.stateBegin.isBefore(keyDate) &&
+                    it.stateEnd.isAfter(keyDate) &&
+                    it.head.items.every {
+                        it.stateBegin.isBefore(keyDate) && it.stateEnd.isAfter(keyDate)
+                    } &&
+                    it.head.discounts.every {
+                        it.stateBegin.isBefore(keyDate) && it.stateEnd.isAfter(keyDate)
+                    }
+
+        }
+        assert state.head.contacts.every { it.stateBegin.isBefore(keyDate) && it.stateEnd.isAfter(keyDate) }
+    }
+
+    @Ignore
+    def "A snapshot fetch and save for an aggregate via state entity for given key date"() {
+
+        given: "A valid aggregate snapshot"
+        PersonHead person = repository.create(validPerson())
+        UUID id = person.id
+        reportInfo "Initial aggregate: ${person}"
+        entityManager.clear()
+        LocalDate keyDate = LocalDate.of(2003, 1, 1)
+        PersonState state = stateRepository.findOneByKeyDate(id, keyDate).get()
+
+        when: "it is being manipulated"
+        entityManager.clear()
+
+        and: "saved"
+        stateRepository.saveAllCurrentStates(state)
+
+        then: "it should be saved successfully"
         reportInfo "Fetched states by a key date: ${state}"
         reportInfo "Fetched head via state by a key date: ${state.head}"
         assert state.head.states.size() == 1
