@@ -15,6 +15,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import java.time.LocalDate;
 import java.util.Collection;
 
 @Getter
@@ -43,5 +44,8 @@ public class ContractHead extends AbstractUUIDPersistable implements Head {
     @JoinColumn(name = "contract_id")
     @Filter(name="state")
     public Collection<DiscountState> discounts;
+
+    private LocalDate validFrom;
+    private LocalDate validTo;
 
 }

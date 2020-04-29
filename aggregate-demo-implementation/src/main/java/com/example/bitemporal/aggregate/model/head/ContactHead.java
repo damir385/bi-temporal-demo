@@ -9,6 +9,7 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Collection;
 
 @Getter
@@ -29,5 +30,8 @@ public class ContactHead extends AbstractUUIDPersistable implements Head {
     @ManyToOne
     @JoinColumn(name = "type")
     private ContactType type;
+
+    private LocalDate validFrom;
+    private LocalDate validTo;
 
 }

@@ -15,6 +15,7 @@ import com.example.bitemporal.aggregate.test.PersonFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
+import org.springframework.test.context.jdbc.Sql
 import org.springframework.transaction.annotation.Transactional
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.spock.Testcontainers
@@ -127,6 +128,7 @@ class PersonBusinessHistorySpecification extends Specification implements Person
 
     }
 
+    @Sql()
     def "A snapshot fetch for an aggregate for given key date"() {
 
         given: "A valid aggregate history stored in database"

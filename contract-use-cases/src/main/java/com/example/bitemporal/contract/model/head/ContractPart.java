@@ -1,12 +1,10 @@
-package com.example.bitemporal.aggregate.model.head;
+package com.example.bitemporal.contract.model.head;
 
-import com.example.bitemporal.aggregate.model.state.ItemState;
+import com.example.bitemporal.contract.model.state.ContractPartState;
 import com.example.persistence.api.model.Head;
 import com.example.persistence.model.AbstractUUIDPersistable;
 import lombok.*;
 import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
 import org.hibernate.envers.Audited;
 
 import javax.persistence.CascadeType;
@@ -24,14 +22,13 @@ import java.util.Collection;
 @Entity
 @Audited
 @SuppressWarnings("squid:S2160")
-public class ItemHead extends AbstractUUIDPersistable implements Head {
+public class ContractPart extends AbstractUUIDPersistable implements Head {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "head")
     @Filter(name = "state")
-    private Collection<ItemState> states;
+    private Collection<ContractPartState> states;
 
     private LocalDate validFrom;
 
     private LocalDate validTo;
-
 }

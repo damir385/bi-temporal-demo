@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <changeSet author="dc" id="contract">
+        <createTable tableName="contract">
+            <column name="id" type="uuid">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="contract_no" type="varchar(64)"/>
+            <column name="valid_from" type="date"/>
+            <column name="valid_to" type="date"/>
+        </createTable>
+
+        <createTable tableName="contract_state">
+            <column name="id" type="uuid">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="head_id" type="uuid"/>
+            <column name="premium" type="currency"/>
+            <column name="state_begin" type="date"/>
+            <column name="state_end" type="date"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="contract_state" baseColumnNames="head_id"
+                                 referencedTableName="contract" referencedColumnNames="id"
+                                 constraintName="contract_state_contract_fk"/>
+    </changeSet>
+
+    <changeSet author="dc" id="contract_part">
+        <createTable tableName="contract_part">
+            <column name="id" type="uuid">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="valid_from" type="date"/>
+            <column name="valid_to" type="date"/>
+        </createTable>
+
+        <createTable tableName="contract_part_state">
+            <column name="id" type="uuid">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="head_id" type="uuid"/>
+            <column name="contract_id" type="uuid"/>
+            <column name="premium" type="currency"/>
+            <column name="description" type="varchar(64)"/>
+            <column name="state_begin" type="date"/>
+            <column name="state_end" type="date"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="contract_part_state" baseColumnNames="head_id"
+                                 referencedTableName="contract_part" referencedColumnNames="id"
+                                 constraintName="contract_part_state_state_contract_part_fk"/>
+        <addForeignKeyConstraint baseTableName="contract_part_state" baseColumnNames="contract_id"
+                                 referencedTableName="contract" referencedColumnNames="id"
+                                 constraintName="contract_part_contract_fk"/>
+    </changeSet>
+</databaseChangeLog>
+
+
+
+

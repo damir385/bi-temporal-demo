@@ -43,4 +43,7 @@ public class PersonHead extends AbstractAggregate {
     @JoinColumn(name = "person_id")
     @Filter(name="state")
     private Collection<ContractState> contracts;
+
+    private LocalDate validFrom;
+    private LocalDate validTo;
 }

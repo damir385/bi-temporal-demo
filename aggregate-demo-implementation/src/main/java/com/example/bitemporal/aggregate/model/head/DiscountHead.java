@@ -10,6 +10,7 @@ import org.hibernate.envers.Audited;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import java.time.LocalDate;
 import java.util.Collection;
 
 @Getter
@@ -26,5 +27,8 @@ public class DiscountHead extends AbstractUUIDPersistable implements Head {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "head")
     @Filter(name = "state")
     private Collection<DiscountState> states;
+
+    private LocalDate validFrom;
+    private LocalDate validTo;
 
 }

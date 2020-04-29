@@ -30,6 +30,8 @@ import static java.lang.String.format;
 @NoRepositoryBean
 public class BusinessHistoryStateRepositoryResolver<S extends State<?>> extends SimpleJpaRepository<S, UUID> implements BusinessHistoryStateRepository<S> {
 
+    private static final class NotImplemented extends RuntimeException {
+    }
 
     private final JpaEntityInformation<S, ?> entityInformation;
     private final RevisionRepository<S, UUID, Long> revisionRepository;
@@ -48,15 +50,6 @@ public class BusinessHistoryStateRepositoryResolver<S extends State<?>> extends 
         this(JpaEntityInformationSupport.getEntityInformation(domainClass, em), em);
     }
 
-    @Override
-    public S update(S state) {
-        return null;
-    }
-
-    @Override
-    public void delete(S state, TimeStretchOption option) {
-
-    }
 
     @Override
     public Optional<S> findOneByKeyDate(UUID headId, LocalDate keyDate) {
@@ -66,40 +59,31 @@ public class BusinessHistoryStateRepositoryResolver<S extends State<?>> extends 
                         .setParameter("headId", headId)
                         .setParameter("keyDate", keyDate)
                         .getSingleResult());
-
     }
 
     @Override
-    @Transactional
-    public S saveAllCurrentStates(S state) {
-        //TODO
-        getHeadReferenceValues(state, em)
-                .stream().forEach(s -> saveState(s, em));
-        if (entityInformation.isNew(state)) {
-            em.persist(state);
-            return state;
-        } else {
-            return em.merge(state);
-        }
+    public <T extends S> T save(T entity) {
+        if (entityInformation.isNew(entity) && entity.getHead().isNew()) return super.save(entity);
+        throw new NotImplemented();
     }
 
     @Override
     public Optional<Revision<Long, S>> findLastChangeRevision(UUID uuid) {
-        return Optional.empty();
+        return revisionRepository.findLastChangeRevision(uuid);
     }
 
     @Override
     public Revisions<Long, S> findRevisions(UUID uuid) {
-        return null;
+        return revisionRepository.findRevisions(uuid);
     }
 
     @Override
     public Page<Revision<Long, S>> findRevisions(UUID uuid, Pageable pageable) {
-        return null;
+        return revisionRepository.findRevisions(uuid, pageable);
     }
 
     @Override
     public Optional<Revision<Long, S>> findRevision(UUID uuid, Long revisionNumber) {
-        return Optional.empty();
+        return revisionRepository.findRevision(uuid, revisionNumber);
     }
 }
