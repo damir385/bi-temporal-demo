@@ -3,6 +3,7 @@ package com.example.persistence.repository;
 import com.example.persistence.api.model.Head;
 import com.example.persistence.api.model.State;
 import org.hibernate.Session;
+import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.data.repository.core.EntityInformation;
 
 import javax.persistence.EntityManager;
@@ -17,7 +18,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,8 +26,6 @@ import static java.util.stream.Collectors.toSet;
 
 class RepositoryUtil {
 
-    private RepositoryUtil() {
-    }
 
     public static final ZoneId DEFAULT_ZONE_ID = ZoneId.systemDefault();
     public static final String DEFAULT_FILTER_NAME = "state";
@@ -67,17 +65,9 @@ class RepositoryUtil {
         Metamodel metamodel = entityManager.getMetamodel();
         final Class<?> stateClass = state.getClass();
         final Class<?> headClass = getHeadClass(stateClass, metamodel);
-        SingularAttribute<State<?>, Head> headAttribute = (SingularAttribute<State<?>, Head>) metamodel
-                .entity(stateClass)
-                .getDeclaredSingularAttributes()
-                .stream()
-                .filter(singularAttribute -> Head.class.isAssignableFrom(singularAttribute.getJavaType()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(format("Could not find a head for %s", stateClass.getName())));
+        final Head value = state.getHead();
 
-        Head value = getValue(state, headAttribute);
-
-        Set<PluralAttribute<?, Collection, ?>> states =
+        Set<PluralAttribute<?, Collection, ?>> stateAttributes =
                 metamodel
                         .entity(headClass)
                         .getDeclaredPluralAttributes()
@@ -86,22 +76,31 @@ class RepositoryUtil {
                         .map(pluralAttribute -> (PluralAttribute<?, Collection, ?>) pluralAttribute)
                         .collect(Collectors.toSet());
         //dead end !!!!
-        List<Object> stateValues = states
+        Set<State<?>> stateValues = stateAttributes
                 .stream()
-                //.map(pluralAttribute -> pluralAttribute.getJavaMember())
                 .map(it -> getValues1(value, it))
-                .collect(Collectors.toList());
-        return null;
+                .flatMap(Collection::stream)
+                .map(it -> (State<?>) it)
+                .collect(Collectors.toSet());
+        stateValues.addAll(
+                stateValues
+                        .stream()
+                        .map(it -> getHeadReferenceValues(it, entityManager))
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toSet())
+        );
+        return stateValues;
     }
 
 
     static State<?> saveState(State<?> state, EntityManager entityManager) {
-        //if (entityInformation.isNew(state)) {
-        entityManager.persist(state);
-        return state;
-        //  } else {
-        //     return entityManager.merge(state);
-        // }
+        EntityInformation entityInformation = JpaEntityInformationSupport.getEntityInformation(state.getClass(), entityManager);
+        if (entityInformation.isNew(state)) {
+            entityManager.persist(state);
+            return state;
+        } else {
+            return entityManager.merge(state);
+        }
     }
 
     private static Class<?> getHeadClass(Class<?> stateClass, Metamodel metamodel) {

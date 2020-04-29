@@ -19,6 +19,6 @@ public abstract class AbstractUUIDPersistable extends AbstractPersistable<UUID>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    protected UUID id;
 }
 

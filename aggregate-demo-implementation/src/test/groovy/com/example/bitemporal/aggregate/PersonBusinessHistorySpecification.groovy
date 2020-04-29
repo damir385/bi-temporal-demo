@@ -232,7 +232,7 @@ class PersonBusinessHistorySpecification extends Specification implements Person
         assert state.head.contacts.every { it.stateBegin.isBefore(keyDate) && it.stateEnd.isAfter(keyDate) }
     }
 
-    @Ignore
+    //@Ignore
     def "A snapshot fetch and save for an aggregate via state entity for given key date"() {
 
         given: "A valid aggregate snapshot"

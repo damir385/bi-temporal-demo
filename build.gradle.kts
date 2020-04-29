@@ -64,6 +64,7 @@ subprojects {
     val gebSpockVersion: String by project
     val seleniumVersion: String by project
     val dataSourceProxyVersion: String by project
+    val joolVersion: String by project
 
 
     the<DependencyManagementExtension>().apply {
@@ -80,6 +81,7 @@ subprojects {
             dependency("org.gebish:geb-spock:${gebSpockVersion}")
             dependency("org.seleniumhq.selenium:selenium-support:${seleniumVersion}")
             dependency("net.ttddyy:datasource-proxy:${dataSourceProxyVersion}")
+            dependency("org.jooq:jool-java-8:${joolVersion}")
         }
     }
 }

@@ -4,6 +4,7 @@ import com.example.bitemporal.aggregate.model.state.ContactState;
 import com.example.bitemporal.aggregate.model.state.ContractState;
 import com.example.bitemporal.aggregate.model.state.PersonState;
 import com.example.persistence.api.model.Head;
+import com.example.persistence.model.AbstractAggregate;
 import com.example.persistence.model.AbstractUUIDPersistable;
 import lombok.*;
 import org.hibernate.annotations.Filter;
@@ -25,7 +26,7 @@ import java.util.Collection;
 @Entity
 @Audited
 @SuppressWarnings("squid:S2160")
-public class PersonHead extends AbstractUUIDPersistable implements Head {
+public class PersonHead extends AbstractAggregate {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "head")
     @Filter(name="state")

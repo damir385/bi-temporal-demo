@@ -70,10 +70,11 @@ public class BusinessHistoryStateRepositoryResolver<S extends State<?>> extends 
     }
 
     @Override
+    @Transactional
     public S saveAllCurrentStates(S state) {
         //TODO
-        //getHeadReferenceValues(state, em)
-        //        .stream().forEach(s -> saveState(s, em));
+        getHeadReferenceValues(state, em)
+                .stream().forEach(s -> saveState(s, em));
         if (entityInformation.isNew(state)) {
             em.persist(state);
             return state;

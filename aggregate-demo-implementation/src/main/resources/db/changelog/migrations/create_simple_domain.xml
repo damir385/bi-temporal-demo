@@ -8,14 +8,15 @@
     <changeSet author="dc" id="person">
         <createTable tableName="person_head">
             <column name="id" type="uuid">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
+            <column name="version" type="bigint"/>
             <column name="birth_date" type="date"/>
         </createTable>
 
         <createTable tableName="person_state">
             <column name="id" type="uuid">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="head_id" type="uuid"/>
             <column name="first_name" type="varchar(64)"/>
@@ -31,16 +32,15 @@
     <changeSet author="dc" id="contact">
         <createTable tableName="contact_type">
             <column name="id" type="uuid">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="description" type="varchar(64)"/>
         </createTable>
 
 
-
         <createTable tableName="contact_head">
             <column name="id" type="uuid">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="type" type="uuid"/>
         </createTable>
@@ -50,7 +50,7 @@
 
         <createTable tableName="contact_state">
             <column name="id" type="uuid">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="head_id" type="uuid"/>
             <column name="person_id" type="uuid"/>
@@ -66,7 +66,7 @@
 
         <createTable tableName="phone_state">
             <column name="id" type="uuid">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="number" type="varchar(16)"/>
         </createTable>
@@ -77,7 +77,7 @@
 
         <createTable tableName="postal_address_state">
             <column name="id" type="uuid">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="zip_code" type="varchar(8)"/>
             <column name="city" type="varchar(64)"/>
@@ -90,7 +90,7 @@
 
         <createTable tableName="email_state">
             <column name="id" type="uuid">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="email" type="varchar(64)"/>
         </createTable>
@@ -115,14 +115,14 @@
     <changeSet author="dc" id="contract">
         <createTable tableName="contract_head">
             <column name="id" type="uuid">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="number" type="varchar(10)"/>
         </createTable>
 
         <createTable tableName="contract_state">
             <column name="id" type="uuid">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="head_id" type="uuid"/>
             <column name="person_id" type="uuid"/>
@@ -139,13 +139,13 @@
 
         <createTable tableName="item_head">
             <column name="id" type="uuid">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
         </createTable>
 
         <createTable tableName="item_state">
             <column name="id" type="uuid">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="head_id" type="uuid"/>
             <column name="contract_id" type="uuid"/>
@@ -164,13 +164,13 @@
 
         <createTable tableName="discount_head">
             <column name="id" type="uuid">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
         </createTable>
 
         <createTable tableName="discount_state">
             <column name="id" type="uuid">
-                <constraints nullable="false" primaryKey="true" />
+                <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="head_id" type="uuid"/>
             <column name="contract_id" type="uuid"/>
@@ -187,6 +187,39 @@
                                  constraintName="discount_contract_fk"/>
     </changeSet>
 
+    <changeSet author="dc" id="test">
+        <createTable tableName="test">
+            <column name="id" type="uuid">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="dummy" type="varchar(64)"/>
+            <column name="version" type="integer"/>
+        </createTable>
+
+        <createTable tableName="stuff">
+            <column name="id" type="uuid">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="test_id" type="uuid"/>
+            <column name="info" type="varchar(64)"/>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="stuff" baseColumnNames="test_id"
+                                 referencedTableName="test" referencedColumnNames="id"
+                                 constraintName="stuff_test_fk"/>
+
+        <createTable tableName="stuff_item">
+            <column name="id" type="uuid">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="stuff_id" type="uuid"/>
+            <column name="detail" type="varchar(64)"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="stuff_item" baseColumnNames="stuff_id"
+                                 referencedTableName="stuff" referencedColumnNames="id"
+                                 constraintName="stuff_item_stuff_fk"/>
+
+    </changeSet>
 </databaseChangeLog>
 
 
